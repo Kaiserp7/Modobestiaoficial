@@ -1,0 +1,69 @@
+<!-- gestionar_ofertas.html -->
+
+{% extends 'productos/base.html' %}
+
+{% block content %}
+<h1>Gestión de Ofertas</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar Oferta</button>
+</form>
+
+<h2>Ofertas Existentes</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Descuento (%)</th>
+            <th>Precio Oferta</th>
+            <th>Precio Anterior</th>
+            <th>Detalle</th>
+            <th>Imagen Oferta</th>
+            <th>Producto Regalo</th>
+            <th>Imagen Regalo</th>
+            <th>Precio Regalo</th>
+            <th>Imagen Slider</th>
+            <th>Fecha de Inicio</th>
+            <th>Fecha de Fin</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for oferta in ofertas %}
+        <tr>
+            <td>{{ oferta.producto.nombre }}</td>
+            <td>{{ oferta.descuento }}</td>
+            <td>{{ oferta.precio_oferta }}</td>
+            <td>{{ oferta.precio_anterior }}</td>
+            <td>{{ oferta.detalle_oferta }}</td>
+            <td>
+                {% if oferta.imagen_oferta %}
+                    <img src="{{ oferta.imagen_oferta.url }}" alt="Imagen Oferta" width="100">
+                {% else %}
+                    No disponible
+                {% endif %}
+            </td>
+            <td>{{ oferta.producto_regalo }}</td>
+            <td>
+                {% if oferta.imagen_regalo %}
+                    <img src="{{ oferta.imagen_regalo.url }}" alt="Imagen Regalo" width="100">
+                {% else %}
+                    No disponible
+                {% endif %}
+            </td>
+            <td>{{ oferta.precio_regalo }}</td>
+            <td>
+                {% if oferta.imagen_slider %}
+                    <img src="{{ oferta.imagen_slider.url }}" alt="Imagen Slider" width="100">
+                {% else %}
+                    No disponible
+                {% endif %}
+            </td>
+            <td>{{ oferta.fecha_inicio }}</td>
+            <td>{{ oferta.fecha_fin }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

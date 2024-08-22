@@ -1,0 +1,26 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+
+{% block title %}Productos en {{ categoria.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Productos en {{ categoria.nombre }}</h1>
+
+    <div class="row">
+        {% for producto in productos %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                    <p class="card-text">{{ producto.descripcion }}</p>
+                    <p class="card-text">Precio: ${{ producto.precio }}</p>
+                    <a href="#" class="btn btn-primary">Comprar</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+{% block content %}
+<h1>Gestión del Slider</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar Slider</button>
+</form>
+
+{% endblock %}

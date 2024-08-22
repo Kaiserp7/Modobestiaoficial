@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Boleta - Modo Bestia Chile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px; /* Espacio adicional debajo del encabezado */
+        }
+
+        .header img {
+            width: 150px; /* Tamaño del logo ajustado */
+            height: auto;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 10px 0; /* Espacio adicional arriba y abajo del título */
+        }
+
+        .header p {
+            font-size: 16px;
+            margin: 5px 0; /* Espacio adicional arriba y abajo de la fecha */
+        }
+
+        .content {
+            margin: 20px;
+        }
+
+        .content h2 {
+            font-size: 20px; /* Tamaño de fuente para el título de contenido */
+            margin-bottom: 15px; /* Espacio debajo del título de contenido */
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .content table th, .content table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .content table th {
+            background-color: #f4f4f4;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .footer h3 {
+            font-size: 18px; /* Tamaño de fuente para el total */
+            margin: 0; /* Quitar márgenes alrededor del total */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{% static 'img/modobestia.jpeg' %}" alt="Logo Modo Bestia">
+        <h1>Modo Bestia Chile - Los Ángeles</h1>
+        <p>Fecha de la compra: {{ pedido.fecha|date:"d/m/Y" }}</p>
+    </div>
+
+    <div class="content">
+        <h2>Detalle de Boleta</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in pedido.productos.all %}
+                <tr>
+                    <td>{{ item.producto.nombre }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td>${{ item.producto.precio|floatformat:2 }}</td>
+                    <td>${{ item.cantidad|floatformat:2|add:item.producto.precio|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <h3>Total: ${{ pedido.valor_total|floatformat:2 }}</h3>
+    </div>
+</body>
+</html>

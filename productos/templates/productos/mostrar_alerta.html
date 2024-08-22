@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicia sesión</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Inicia sesión',
+                text: 'Debes iniciar sesión para realizar esta acción.',
+                confirmButtonText: 'Iniciar sesión'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    window.location.href = '{% url "login" %}';  // Redirige al login
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

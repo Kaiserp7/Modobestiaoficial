@@ -1,0 +1,19 @@
+{% extends 'productos/base.html' %}
+
+{% block content %}
+  <h2>Instrucciones para Transferencia Bancaria</h2>
+  <p>Por favor, realice la transferencia a la siguiente cuenta:</p>
+  <ul>
+    <li>Banco: Banco Ejemplo</li>
+    <li>Cuenta: 123456789</li>
+    <li>RUT: 12.345.678-9</li>
+    <li>Email: transferencias@ejemplo.com</li>
+  </ul>
+
+  <h3>Subir Comprobante</h3>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="comprobante" required>
+    <button type="submit">Subir Comprobante</button>
+  </form>
+{% endblock %}

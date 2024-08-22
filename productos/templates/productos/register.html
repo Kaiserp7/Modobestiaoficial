@@ -1,0 +1,175 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+<style>
+    .custom-card {
+        border-radius: 15px;
+        border: 1px solid #e3e3e3;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #f5f5f5, #ffffff);
+        padding: 2rem;
+    }
+    .custom-card-title {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .custom-form-group {
+        margin-bottom: 1rem;
+    }
+    .custom-form-group input,
+    .custom-form-group select,
+    .custom-form-group textarea {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .custom-form-group input:focus,
+    .custom-form-group select:focus,
+    .custom-form-group textarea:focus {
+        border-color: #6c63ff;
+        box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
+    }
+    .custom-btn {
+        background-color: #6c63ff;
+        border: none;
+        color: #ffffff;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+    .custom-btn:hover {
+        background-color: #5a54e2;
+    }
+    #map {
+        height: 300px;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <h3 class="custom-card-title text-center">Registro</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="custom-form-group">
+                            <label for="id_username">Nombre de Usuario:</label>
+                            <input type="text" id="id_username" name="username" value="{{ form.username.value }}" required>
+                            {{ form.username.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="id_nombre">Nombre:</label>
+                            <input type="text" id="id_nombre" name="nombre" value="{{ form.nombre.value }}" required>
+                            {{ form.nombre.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="id_apellido">Apellido:</label>
+                            <input type="text" id="id_apellido" name="apellido" value="{{ form.apellido.value }}" required>
+                            {{ form.apellido.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="id_rut">RUT:</label>
+                            <input type="text" id="id_rut" name="rut" value="{{ form.rut.value }}" placeholder="Ej: 12345678-9" required>
+                            {{ form.rut.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="id_telefono">Número de Teléfono:</label>
+                            <input type="text" id="id_telefono" name="telefono" value="{{ form.telefono.value }}" placeholder="+56912345678" pattern="\+569\d{8}" required>
+                            {{ form.telefono.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="id_direccion">Dirección:</label>
+                            <input type="text" id="id_direccion" name="direccion" value="{{ form.direccion.value }}" required>
+                            {{ form.direccion.errors }}
+                        </div>
+                        <div id="map"></div>
+                        <div class="custom-form-group">
+                            <label for="id_email">Email:</label>
+                            <input type="email" id="id_email" name="email" value="{{ form.email.value }}" required>
+                            {{ form.email.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="id_password1">Contraseña:</label>
+                            <input type="password" id="id_password1" name="password1" required>
+                            {{ form.password1.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="id_password2">Confirmar Contraseña:</label>
+                            <input type="password" id="id_password2" name="password2" required>
+                            {{ form.password2.errors }}
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="custom-btn">Registrarse</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBntM7NyT/+mxmzzp8r3Tur2VVDFrGaTROf4VsE5z9AboGzq0EdFh3blFUE3IlS5cnN0TfGp1rbXoQ0ASdQ==" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-5Q1f7UpG+7P6kRAC1nA5B6w5H1xM7lE9T8z3SxEu6E5m3UKT0FNp3KTOi9+TkzGx9r0R8vIHVRqVbyo/FxgKGA==" crossorigin=""></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if form.errors %}
+            Swal.fire({
+                title: 'Error!',
+                text: 'Por favor, asegúrate de que los campos estén completados correctamente.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+        {% endif %}
+
+        // Inicializa el mapa
+        var map = L.map('map').setView([-33.4489, -70.6693], 13);  // Centra en Santiago, Chile
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        var marker;
+
+        function onMapClick(e) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker(e.latlng).addTo(map);
+            getAddress(e.latlng.lat, e.latlng.lng);
+        }
+
+        map.on('click', onMapClick);
+
+        function getAddress(lat, lng) {
+            var url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.address) {
+                        var address = data.display_name;
+                        document.getElementById('id_direccion').value = address;
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'No se pudo obtener la dirección.',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    });
+</script>
+{% endblock %}

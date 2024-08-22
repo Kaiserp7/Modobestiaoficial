@@ -1,0 +1,36 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Buscar Pedido{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4" style="color: #f5ed19;">Buscar Pedido</h2>
+
+    <form method="GET" action="{% url 'verificar_pedido' %}">
+        <div class="form-group">
+            <label for="pedido_id">ID del Pedido</label>
+            <input type="text" name="pedido_id" id="pedido_id" class="form-control" placeholder="Ingrese el ID del pedido">
+        </div>
+
+        <div class="form-group">
+            <label for="codigo">Código del Pedido</label>
+            <input type="text" name="codigo" id="codigo" class="form-control" placeholder="Ingrese el código del pedido">
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Buscar</button>
+    </form>
+</div>
+
+{% if error %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Pedido no encontrado',
+        text: '{{ error }}',
+        confirmButtonText: 'OK'
+    });
+</script>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Iniciar Pago</h1>
+<form method="post" action="{% url 'iniciar_pago' %}">
+    {% csrf_token %}
+    <label for="monto">Monto:</label>
+    <input type="text" id="monto" name="monto" required>
+    <button type="submit">Pagar</button>
+</form>
+{% endblock %}

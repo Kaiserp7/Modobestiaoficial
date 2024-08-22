@@ -1,0 +1,65 @@
+{% extends 'productos/base.html' %}
+
+{% block content %}
+<h1>Escanear Código QR</h1>
+<p>Escanea el código QR de la boleta para verificar el estado del pedido.</p>
+
+<!-- Botón para escanear el código QR -->
+<button id="btn-scan-qr" class="btn btn-primary">Escanear Código QR</button>
+
+<!-- Contenedor oculto para el lector QR -->
+<div id="reader" style="width: 300px; display: none;"></div>
+
+<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+<script>
+    document.getElementById('btn-scan-qr').addEventListener('click', function() {
+        // Mostrar el contenedor del lector QR
+        document.getElementById('reader').style.display = 'block';
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 }
+        );
+        
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+        // Forzar al navegador a pedir permisos de cámara
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                // Permisos concedidos
+                console.log('Permiso concedido para usar la cámara');
+            })
+            .catch(err => {
+                console.error('No se pudo acceder a la cámara:', err);
+                alert('No se pudo acceder a la cámara. Por favor, verifica los permisos.');
+            });
+    });
+
+    function onScanSuccess(decodedText, decodedResult) {
+        // Enviar el texto del QR al servidor
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '';
+        
+        const csrfToken = "{{ csrf_token }}";
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'codigo';
+        input.value = decodedText;
+        form.appendChild(input);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function onScanFailure(error) {
+        console.warn(`QR error: ${error}`);
+    }
+</script>
+
+{% endblock %}

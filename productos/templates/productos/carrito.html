@@ -1,0 +1,326 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+{% block title %}Carrito de Compras{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="bg-light p-4 rounded shadow-sm">
+        <h2 class="mb-4 text-center">Carrito de Compras</h2>
+
+        {% if carrito_items %}
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Tipo de Envío</h3>
+                    <form method="post" action="{% url 'ver_carrito' %}" id="tipo-envio-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="tipo_envio">Selecciona el tipo de envío:</label>
+                            <select name="tipo_envio" id="tipo_envio" class="form-control">
+                                {% for key, value in tipo_envio_choices %}
+                                    <option value="{{ key }}" {% if pedido.tipo_envio == key %} selected {% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Actualizar Tipo de Envío</button>
+                    </form>
+
+                    <div class="mt-4">
+                        {% if pedido.tipo_envio == 'domicilio_registro' %}
+                            <p><strong>Dirección de Envío:</strong> {{ pedido.direccion_envio }}</p>
+                        {% elif pedido.tipo_envio == 'domicilio_manual' %}
+                            <form method="POST" action="{% url 'ver_carrito' %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="nueva_direccion" placeholder="Ingrese nueva dirección">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Guardar Dirección</button>
+                            </form>
+                        {% elif pedido.tipo_envio == 'retiro_sucursal' %}
+                            <p><strong>Dirección de Retiro:</strong> Modo Bestia, Los Ángeles, CHILE, Galería Colón, Calle Valdivia, Frente al Mall</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h3>Productos en el Carrito</h3>
+                    <div class="list-group">
+                        {% for item in carrito_items %}
+                            <div class="list-group-item d-flex justify-content-between align-items-start border rounded mb-3 p-3">
+                                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="img-fluid rounded mr-3" style="max-width: 120px;">
+                                <div class="w-100">
+                                    <h5 class="mb-1">{{ item.producto.nombre }}</h5>
+                                    {% if item.sabor %}
+                                        <p><strong>Sabor:</strong> {{ item.sabor }}</p>
+                                    {% endif %}
+                                    <div class="precio-container">
+                                        {% if item.producto.descuento > 0 %}
+                                            <p class="precio-normal">Precio Normal: ${{ item.producto.precio|floatformat:0 }}</p>
+                                            <p class="precio-oferta">Precio Oferta: ${{ item.producto.precio_con_descuento|floatformat:0 }}</p>
+                                        {% else %}
+                                            <p>Precio: ${{ item.producto.precio|floatformat:0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <form class="modificar-cantidad-form d-inline-block" data-url="{% url 'modificar_cantidad' item.id %}">
+                                        {% csrf_token %}
+                                        <div class="input-group">
+                                            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" max="{{ item.producto.stock }}" class="form-control">
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-warning">
+                                                    <i class="fas fa-edit"></i> Modificar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <button class="btn btn-danger eliminar-item-btn ml-2" data-url="{% url 'eliminar_del_carrito' item.id %}">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                  
+                                    {% for item_id, subtotal in subtotal_items %}
+                                        {% if item_id == item.id %}
+                                            <p class="mt-2 mb-0"><strong>Subtotal: ${{ subtotal|floatformat:0 }}</strong></p>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <p class="mb-0"><strong>Cantidad:</strong> {{ item.cantidad }}</p>
+                                </div>
+                                <span class="badge bg-primary text-white rounded-pill">$ {{ subtotal|floatformat:0 }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr>
+                    <button class="btn btn-warning limpiar-carrito-btn ml-2" data-url="{% url 'limpiar_carrito' %}">
+                        <i class="fas fa-broom"></i> Limpiar Carrito
+                    </button>
+                    <h4 class="text-center mb-4">Total del Carrito: $ <span id="carrito-total-valor">{{ total_carrito|floatformat:0 }}</span></h4>
+
+                    {% if descuento_aplicado %}
+                        <div class="text-center mb-4">
+                            <h4>Cupon Aplicado: {{ descuento_aplicado }}%</h4>
+                        </div>
+                    {% else %}
+                        <div class="text-center mb-4">
+                            <h4>No hay cupón aplicado.</h4>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'aplicar_cupon' %}" class="text-center" id="cupon-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="codigo_cupon">Código del Cupón:</label>
+                            <input type="text" name="codigo_cupon" id="codigo_cupon" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Aplicar Cupón</button>
+                    </form>    
+                                  <input type="hidden" name="tipo_envio" value="{{ pedido.tipo_envio }}">
+                    <div class="text-center mt-4">
+                        <a href="#" id="pagar-btn" class="btn btn-success btn-lg">
+                            <i class="fas fa-credit-card"></i> Pagar y Realizar Pedido
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center">Tu carrito está vacío.</p>
+        {% endif %}
+        <div id="messages" data-messages="[]"></div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Confirmación para eliminar producto del carrito
+        document.querySelectorAll('.eliminar-item-btn').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const url = this.getAttribute('data-url');
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Tus productos se eliminarán. ¿Estás seguro de realizar esta acción?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.closest('.list-group-item').remove();
+                                document.getElementById('carrito-total-valor').innerText = data.carrito_total;
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Eliminado',
+                                    text: 'Producto eliminado del carrito'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.message
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+        });
+
+        // Confirmación para modificar cantidad en el carrito
+        document.querySelectorAll('.modificar-cantidad-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const url = this.getAttribute('data-url');
+                const formData = new FormData(this);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Actualizado',
+                            text: data.message
+                        }).then(() => {
+                            location.reload(); // Recargar la página para actualizar el carrito
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+
+        // Confirmación para actualizar tipo de envío
+            const tipoEnvioForm = document.getElementById('tipo-envio-form');
+        if (tipoEnvioForm) {
+            tipoEnvioForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas actualizar el tipo de envío?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, actualizar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        tipoEnvioForm.submit(); // Enviar el formulario si el usuario confirma
+                    }
+                });
+            });
+        }
+
+        // Confirmación para aplicar cupón
+        const cuponForm = document.getElementById('cupon-form');
+        if (cuponForm) {
+            cuponForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const url = cuponForm.action;
+                const formData = new FormData(cuponForm);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cupón Aplicado',
+                            text: `Cupón aplicado: ${data.message}\nDescuento: ${data.descuento}\nTotal: ${data.total}`,
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            // Actualizar el total del carrito con el nuevo total con descuento
+                            document.getElementById('carrito-total-valor').innerText = data.total;
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message,
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un problema al aplicar el cupón.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+    const eliminarBtn = document.querySelector('.eliminar-item-btn');
+
+    eliminarBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        const url = eliminarBtn.getAttribute('data-url');
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás recuperar los artículos una vez que los hayas eliminado!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, limpiar carrito',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirige a la URL para limpiar el carrito
+                window.location.href = url;
+            }
+        });
+    });
+});
+
+        // Confirmación para realizar el pedido y redirección a Transbank
+        const pagarBtn = document.getElementById('pagar-btn');
+        if (pagarBtn) {
+            pagarBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: 'Redirigiendo a Transbank',
+                    text: 'Estás a punto de ser redirigido a la página de pago de Transbank presiona Aceptar para ir.',
+                    icon: 'info',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar',
+                    timer: 2000 // Opcional: redirige después de 2 segundos
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{% url 'iniciar_pago' pedido.id %}";
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}
+

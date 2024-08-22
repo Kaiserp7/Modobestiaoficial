@@ -1,0 +1,155 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+{% block title %}Resultados de Búsqueda{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Jumbotron para el título -->
+    <div class="jumbotron jumbotron-fluid text-center mb-4">
+        <h1 class="display-4 flaming-text">Resultados de Búsqueda</h1>
+        <hr class="my-4">
+    </div>
+
+    <!-- Sección del dashboard de filtros -->
+    <div class="dashboard-filter-section mb-4">
+        <div class="row">
+            <!-- Formulario de búsqueda -->
+            <div class="col-lg-4 mb-3">
+                <form method="get" action="{% url 'search_products' %}" class="form-inline">
+                    <input class="form-control w-100" type="search" name="query" placeholder="Buscar productos..." aria-label="Buscar" value="{{ request.GET.query }}">
+                    <button type="submit" aria-label="Buscar" class="btn btn-primary btn-block mt-2">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </form>
+            </div>
+            <!-- Formulario de filtros -->
+            <div class="col-lg-8">
+                <form method="get" action="{% url 'filter_products' %}" class="filter-form">
+                    <input type="hidden" name="query" value="{{ request.GET.query }}">
+                    <div class="form-row">
+                        <div class="col-md-4 mb-3">
+                            <label for="min-price" class="text-white">Precio Mínimo:</label>
+                            <input type="number" id="min-price" name="min_price" class="form-control" step="0.01" value="{{ request.GET.min_price }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="max-price" class="text-white">Precio Máximo:</label>
+                            <input type="number" id="max-price" name="max_price" class="form-control" step="0.01" value="{{ request.GET.max_price }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="order-by" class="text-white">Ordenar Por:</label>
+                            <select id="order-by" name="order_by" class="form-control">
+                                <option value="price_asc" {% if request.GET.order_by == 'price_asc' %}selected{% endif %}>Precio: Bajo a Alto</option>
+                                <option value="price_desc" {% if request.GET.order_by == 'price_desc' %}selected{% endif %}>Precio: Alto a Bajo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Filtrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de productos -->
+    <div class="category-products mt-4">
+        {% if productos %}
+            <div class="row">
+                {% for producto in productos %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="card-text">Precio: {{ producto.precio }}</p>
+                            <a href="{% url 'product_detail' producto.id %}" class="btn btn-primary">Ver Detalles</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No se encontraron productos.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .display-4 {
+        color: #000000;
+    }
+    .dashboard-filter-section {
+        background-color: #432d78;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-form .form-group {
+        margin-bottom: 15px;
+    }
+
+    .filter-form .form-group label {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .filter-form .form-control {
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .filter-form .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    .filter-form .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .category-products .card {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-products .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .category-products .card-body {
+        padding: 15px;
+    }
+
+    .category-products .card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .category-products .card-text {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .category-products .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    .category-products .btn-primary:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}

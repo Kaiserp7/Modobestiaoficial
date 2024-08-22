@@ -1,0 +1,175 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    /* Estilos personalizados */
+    .custom-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-card-title {
+        color: #333;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .custom-form-group {
+        margin-bottom: 1rem;
+    }
+
+    .custom-form-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .custom-form-group input,
+    .custom-form-group select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .custom-btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .custom-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <h3 class="custom-card-title text-center">Registro</h3>
+                    <form method="post" action="{% url 'register' %}">
+                        {% csrf_token %}
+                        <div class="custom-form-group">
+                            {{ form.non_field_errors }}
+                        </div>
+
+                        <!-- Campos del formulario -->
+                        <div class="custom-form-group">
+                            {{ form.username.label_tag }}
+                            {{ form.username }}
+                            {{ form.username.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.nombre.label_tag }}
+                            {{ form.nombre }}
+                            {{ form.nombre.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.apellido.label_tag }}
+                            {{ form.apellido }}
+                            {{ form.apellido.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.rut.label_tag }}
+                            {{ form.rut }}
+                            {{ form.rut.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.telefono.label_tag }}
+                            {{ form.telefono }}
+                            {{ form.telefono.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.region.label_tag }}
+                            <select id="id_region" name="region">
+                                <option value="">Seleccione una región</option>
+                                {% for region in regiones %}
+                                    <option value="{{ region.id }}">{{ region.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            {{ form.region.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.comuna.label_tag }}
+                            <select id="id_comuna" name="comuna">
+                                <option value="">Seleccione una comuna</option>
+                                <!-- Las opciones se agregarán dinámicamente con JavaScript -->
+                            </select>
+                            {{ form.comuna.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.direccion.label_tag }}
+                            {{ form.direccion }}
+                            {{ form.direccion.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {{ form.email.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.password1.label_tag }}
+                            {{ form.password1 }}
+                            {{ form.password1.errors }}
+                        </div>
+                        <div class="custom-form-group">
+                            {{ form.password2.label_tag }}
+                            {{ form.password2 }}
+                            {{ form.password2.errors }}
+                        </div>
+
+                        <button type="submit" class="custom-btn">Registrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    const regionSelector = $('#id_region');
+    const comunaSelector = $('#id_comuna');
+
+    // Inicializar las opciones de comuna
+    const comunas = {};
+
+    {% for comuna in comunas %}
+    if (!comunas["{{ comuna.region.id }}"]) {
+        comunas["{{ comuna.region.id }}"] = [];
+    }
+    comunas["{{ comuna.region.id }}"].push({
+        id: "{{ comuna.id }}",
+        nombre: "{{ comuna.nombre }}"
+    });
+    {% endfor %}
+
+    // Manejar el cambio de selección de región
+    regionSelector.change(function() {
+        const regionSeleccionada = $(this).val();
+        comunaSelector.empty().append('<option value="">Seleccione una comuna</option>');
+
+        if (comunas[regionSeleccionada]) {
+            comunas[regionSeleccionada].forEach(function(comuna) {
+                comunaSelector.append(`<option value="${comuna.id}">${comuna.nombre}</option>`);
+            });
+        }
+    });
+
+    // Inicializar el formulario con las comunas disponibles para la región seleccionada
+    regionSelector.trigger('change');
+});
+</script>
+{% endblock %}

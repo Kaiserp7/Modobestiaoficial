@@ -1,0 +1,133 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Detalle del Pedido{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Detalle del Pedido</h1>
+        
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
+            
+            h1, h2, h3 {
+                color: #343a40;
+            }
+            
+            .text-center {
+                text-align: center;
+            }
+            
+            .bg-light {
+                background-color: #ffffff;
+            }
+            
+            .p-3 {
+                padding: 1rem;
+            }
+            
+            .rounded {
+                border-radius: 0.25rem;
+            }
+            
+            .shadow-sm {
+                box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.075);
+            }
+            
+            .table-container {
+                background-color: #ffffff;
+                border: 1px solid #dee2e6;
+                border-radius: 0.25rem;
+                box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.075);
+            }
+            
+            .table th, .table td {
+                text-align: center;
+            }
+            
+            .table th {
+                background-color: #343a40;
+                color: #ffffff;
+            }
+            
+            .btn-primary {
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+            
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #004085;
+            }
+        </style>
+        
+        <section id="pedido" class="mb-5 bg-light p-3 rounded shadow-sm">
+            <h2 class="mb-3">Información del Pedido</h2>
+            <p><strong>ID del Pedido:</strong> {{ pedido.id }}</p>
+            <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
+            <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+            <p><strong>Tipo de Envío:</strong> {{ pedido.tipo_envio }}</p>
+            <p><strong>Dirección de Envío:</strong> {{ pedido.direccion_envio }}</p>
+            <p><strong>Total Compras:</strong> ${{ pedido.total_compras }}</p>
+        </section>
+
+        <section id="productos" class="mb-5">
+            <h2 class="mb-3 text-center">Productos del Pedido</h2>
+            <div class="table-container bg-light p-3 rounded shadow-sm">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Nombre del Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pedido_producto in pedido.productos.all %}
+                            <tr>
+                                <td>{{ pedido_producto.producto.nombre }}</td>
+                                <td class="cantidad">{{ pedido_producto.cantidad }}</td>
+                                <td class="precio_unitario">${{ pedido_producto.producto.precio|floatformat:2 }}</td>
+                                <td class="total"></td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4">No hay productos en este pedido.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="acciones">
+            <a href="{% url 'historial_y_estadisticas' %}" class="btn btn-primary">Volver al Historial y Estadísticas</a>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Selecciona todos los elementos de la tabla que necesitan el cálculo
+            const productos = document.querySelectorAll('tbody tr');
+
+            productos.forEach(function(producto) {
+                const precioUnitarioText = producto.querySelector('.precio_unitario').textContent.replace('$', '');
+                const cantidad = parseFloat(producto.querySelector('.cantidad').textContent);
+                const precioUnitario = parseFloat(precioUnitarioText);
+                const totalCell = producto.querySelector('.total');
+
+                // Verifica si los valores son números válidos
+                if (!isNaN(precioUnitario) && !isNaN(cantidad)) {
+                    // Calcula el total
+                    const total = precioUnitario * cantidad;
+                    // Muestra el total en la celda correspondiente
+                    totalCell.textContent = `$${total.toFixed(2)}`;
+                } else {
+                    totalCell.textContent = `$0.00`;
+                }
+            });
+        });
+    </script>
+{% endblock %}

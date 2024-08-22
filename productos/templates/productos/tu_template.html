@@ -1,0 +1,17 @@
+{% extends 'productos/base.html' %}
+{% block title %}Estado del Pedido{% endblock %}
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estado del Pedido</title>
+</head>
+<body>
+    {% if pedido_activo %}
+        <p>Tienes un pedido activo. Estado: {{ pedido_activo.estado }}</p>
+    {% else %}
+        <p>No tienes pedidos activos.</p>
+    {% endif %}
+</body>
+</html>
+{% endblock %}

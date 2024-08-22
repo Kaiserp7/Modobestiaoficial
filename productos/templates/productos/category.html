@@ -1,0 +1,338 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+{% block title %}{{ categoria.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado de Categoría -->
+    <div class="jumbotron jumbotron-fluid text-center mb-4">
+        <h1 class="display-4 flaming-text">{{ categoria.nombre }}</h1>
+        <p class="lead">{{ categoria.descripcion }}</p>
+        <hr class="my-4">
+    </div>
+
+    <!-- Estilos Personalizados -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .jumbotron {
+            background-color: #fff;
+            color: #333;
+            border-radius: 8px;
+            padding: 2rem 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .flaming-text {
+            color: #0056b3;
+            font-size: 3rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            background: linear-gradient(45deg, #0056b3, #0080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .filter-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-item {
+            margin-bottom: 10px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-img-container {
+            position: relative;
+            overflow: hidden;
+           /* Ajusta la altura según tu diseño */
+            width: 100%;
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ajusta la imagen para cubrir el área sin deformarse */
+            object-position: center; /* Centra la imagen en el contenedor */
+        }
+
+        .card-img-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        .card:hover .card-img-overlay {
+            opacity: 1;
+        }
+
+        .card-img-overlay .btn {
+            color: #fff;
+            font-size: 1.5rem;
+            margin: 0 20px;
+            text-decoration: none;
+            background: none;
+            border: none;
+        }
+
+        .card-img-overlay .btn:hover {
+            color: #0080ff;
+        }
+
+        .card-body {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .card-text .price-normal {
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .card-text .price-offer {
+            color: #0056b3;
+        }
+
+        .btn-primary {
+            background-color: #0056b3;
+            border: none;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #004494;
+        }
+
+        .btn-secondary {
+            background-color: #333;
+            border: none;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #222;
+        }
+
+        .form-control {
+            border: 1px solid #0056b3;
+            border-radius: 4px;
+            color: #0056b3;
+        }
+
+        .form-control:focus {
+            border-color: #0080ff;
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+        }
+
+        .footer {
+            background-color: #333;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+            border-top: 1px solid #444;
+        }
+
+        .footer p {
+            margin: 0;
+        }
+    </style>
+
+    <!-- Filtros -->
+    <div class="filter-container">
+        <form method="get" action="" id="filter-form">
+            <input type="text" name="q" placeholder="Buscar por nombre" value="{{ request.GET.q }}" class="form-control mb-2">
+            <div class="d-flex gap-2">
+                <input type="number" name="precio_min" placeholder="Precio Mínimo" value="{{ request.GET.precio_min }}" class="form-control">
+                <input type="number" name="precio_max" placeholder="Precio Máximo" value="{{ request.GET.precio_max }}" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Aplicar Filtros</button>
+        </form>
+    </div>
+
+    <!-- Productos -->
+    <div class="grid-container">
+        {% for producto in productos %}
+        <div class="card mb-4">
+            <div class="card-img-container">
+                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                <div class="card-img-overlay">
+                    <form action="{% url 'agregar_al_carrito' producto.id %}" method="post" class="add-to-cart-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                    <a href="{% url 'product_detail' producto.id %}" class="btn btn-secondary">
+                        Ver Detalles
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ producto.nombre }}</h5>
+                <div class="card-text">
+                    {% if producto.precio_con_descuento < producto.precio %}
+                    Precio: <span class="price-normal">${{ producto.precio }}</span>
+                    <br>
+                    Precio oferta: <span class="price-offer">${{ producto.precio_con_descuento|floatformat:0 }}</span>
+                    {% else %}
+                    Precio: ${{ producto.precio }}
+                    {% endif %}
+                </div>
+                {% if request.user.is_staff %}
+                <div class="btn-group" role="group" aria-label="Acciones del Producto">
+                    <a href="{% url 'edit_product' producto.id %}" class="btn btn-primary">Modificar Stock</a>
+                    <a href="{% url 'delete_product' producto.id %}" class="btn btn-danger">Eliminar Producto</a>
+                </div>
+                {% endif %}
+                {% if producto.stock > 0 %}
+                <form action="{% url 'agregar_al_carrito' producto.id %}" method="post" class="add-to-cart-form mt-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-shopping-cart" aria-hidden="true"></i> Agregar al Carrito
+                    </button>
+                </form>
+                {% else %}
+                <button type="button" class="btn btn-secondary" disabled>
+                    <i class="fa fa-ban" aria-hidden="true"></i> Agotado
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No se encontraron productos.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Filtrar productos
+        const filterForm = document.getElementById('filter-form');
+        filterForm.addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevenir el envío normal del formulario
+            const url = new URL(window.location.href);
+            const formData = new FormData(filterForm);
+            for (const [key, value] of formData.entries()) {
+                if (value) {
+                    url.searchParams.set(key, value);
+                } else {
+                    url.searchParams.delete(key);
+                }
+            }
+            window.location.href = url.href; // Redirigir a la URL con los parámetros de búsqueda
+        });
+
+        // Agregar al carrito
+        const addToCartForms = document.querySelectorAll('.add-to-cart-form');
+        addToCartForms.forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const url = this.action;
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    },
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            title: 'Producto agregado',
+                            text: 'El producto fue agregado al carrito.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false,
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Producto agregado',
+                            text: data.message || 'Producto agregado al carrito.',
+                            imageUrl: 'https://cdn-icons-png.flaticon.com/512/7457/7457314.png',
+                            imageWidth: 100,
+                            imageHeight: 100,
+                            imageAlt: 'Cara sonriente',
+                            timer: 2000,
+                            showConfirmButton: false,
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Hubo un problema al procesar la solicitud.',
+                        icon: 'error',
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+                });
+            });
+        });
+    });
+</script>
+
+{% endblock content %}

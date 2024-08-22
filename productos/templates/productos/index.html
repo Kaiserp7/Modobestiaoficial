@@ -1,0 +1,631 @@
+<!-- HTML -->
+{% extends 'productos/base.html' %}
+{% load static %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<!-- Sección de bienvenida -->
+<section class="welcome-section">
+    <div class="welcome-content">
+        <img src="{% static 'productos/logo/logo2.png' %}" alt="Modo Bestia Logo" class="welcome-logo">
+    
+        <p class="welcome-description">Encuentra los mejores suplementos deportivos para mejorar tu rendimiento al mejor precio y con calidad garantizada.</p>
+    </div>
+</section>
+
+<!-- Slider de Ofertas -->
+<section class="slider-container">
+    <div class="slider">
+        <div class="slides">
+            <!-- Ofertas -->
+            {% for oferta in ofertas %}
+            <div class="slide{% if forloop.first %} active{% endif %}">
+                <a href="{% url 'ver_productos_categoria' oferta.categoria.id %}">
+                    <img src="{{ oferta.imagen_promocional.url }}" alt="{{ oferta.nombre_oferta }}" class="slider-image">
+                </a>
+                <div class="caption">
+                    <h5>{{ oferta.nombre_oferta }}</h5>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="slider-controls">
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+        <div class="slider-dots">
+            {% for _ in ofertas %}
+            <span class="dot{% if forloop.first %} active{% endif %}" onclick="currentSlide({{ forloop.counter }})"></span>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Sección de Categorías -->
+<section class="categories-section">
+    <h2 class="categories-title">Explora Nuestras Categorías</h2>
+    <div class="categories-grid">
+        {% for categoria in categorias %}
+        <div class="category-card">
+            <div class="category-image-container">
+                <img src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}" class="category-image">
+            </div>
+            <div class="category-info">
+                <h5 class="category-title">{{ categoria.nombre }}</h5>
+                <a href="{% url 'ver_productos_categoria' categoria.id %}" class="btn btn-category">Ver Productos</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Sección del Atleta -->
+<section class="atleta-details">
+    <div class="atleta-presentacion">
+        <h2>¡IMPULSA TUS OBJETIVOS CON NOSOTROS!</h2>
+        <img src="{% static 'productos/logo/JUAMPA.png' %}" alt="Juampa Saavedra" class="atleta-image">
+    
+        <h1>JUAMPA SAAVEDRA</h1>
+        <h3>Con la ayuda de nuestros productos de alta calidad, Juampa Saavedra se prepara para alcanzar el #ModoBestia. Estamos a su lado en cada paso hacia la victoria y confiamos en que logrará un nuevo título de campeón en sus próximas competencias.</h3>
+        <a href="https://www.instagram.com/modo_bestia_los_angeles_supps/" class="btn btn-primary" target="_blank">
+            <img src="{% static 'productos/logo/instagram-icon.png' %}" alt="Instagram" class="instagram-icon">
+            Síguenos en Instagram
+        </a>
+    </div>
+</section>
+
+<!-- Sección de Ubicación -->
+<section class="location-section">
+    <div class="location-map">
+        <!-- Google Maps Embed -->
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3166.6721975277774!2d-72.35351418869833!3d-37.468460914265606!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x966bdd47d664f2c3%3A0x68b1d87853e51e9c!2zR2FsZXLDrWEgQ29sw7Nu!5e0!3m2!1ses-419!2scl!4v1721944533714!5m2!1ses-419!2scl" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <div class="location-details">
+        <h2 class="location-title">Encuéntranos</h2>
+        <p class="location-description">Visítanos en nuestra tienda física para descubrir más productos y ofertas especiales. Nos encontramos en una ubicación de fácil acceso con estacionamiento disponible.</p>
+        <div class="contact-info">
+            <p><strong>Dirección:</strong> Los Ángeles, Valdivia 485, Local 21, Galería Colón.</p>
+            <p><strong>Teléfono:</strong> (+569) 4530 5793</p>
+            <p><strong>Email:</strong> contacto@modobestia.cl</p>
+        </div>
+        <div class="opening-hours">
+            <h3>Horarios de Atención:</h3>
+            <ul>
+                <li>Lunes a Viernes: 9:00 AM - 7:00 PM</li>
+                <li>Sábado: 10:00 AM - 5:00 PM</li>
+                <li>Domingo: Cerrado</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Sección de Contacto -->
+
+
+<!-- Icono de WhatsApp y mensaje de notificación -->
+<div class="whatsapp-container">
+    <a href="https://wa.me/+56945305793" target="_blank" rel="noopener noreferrer" class="whatsapp-link">
+        <img src="{% static 'productos/logo/whatsapp-icon.png' %}" alt="WhatsApp" class="whatsapp-icon">
+    </a>
+    <div class="notification-message">
+        <span>Si tienes una duda, ¡háblanos!</span>
+    </div>
+</div>
+
+<!-- Ventana emergente para iniciar sesión o comprar como invitado -->
+
+<style>
+    /* Estilos Generales */
+    body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Modal */
+    .modal {
+        display: none; /* Ocultar por defecto */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        text-align: center;
+        border-radius: 8px;
+    }
+
+    .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Botones */
+    .btn {
+        display: inline-block;
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    /* Estilos para la sección de bienvenida */
+    .welcome-section {
+        background: url("{% static 'productos/background/welcome-bg.jpg' %}") no-repeat center center;
+        background-size: cover;
+        padding: 50px 0;
+        text-align: center;
+        color: #fff;
+    }
+
+    .welcome-logo {
+        max-width: 200px;
+    }
+
+    .welcome-title {
+        font-size: 36px;
+        margin: 20px 0;
+    }
+
+    .welcome-description {
+        font-size: 18px;
+        margin: 0 auto;
+        max-width: 600px;
+    }
+
+    /* Slider */
+    .slider-container {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .slider {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .slides {
+        display: flex;
+    }
+
+    .slide {
+        min-width: 100%;
+        transition: transform 0.5s ease-in-out;
+    }
+
+    .slide img {
+        width: 100%;
+        height: auto;
+    }
+
+    .caption {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .slider-controls {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+    }
+
+    .prev,
+    .next {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        padding: 10px;
+        cursor: pointer;
+        border: none;
+        font-size: 24px;
+    }
+
+    .prev:hover,
+    .next:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .slider-dots {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .dot {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin: 0 5px;
+        background-color: #bbb;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .dot.active {
+        background-color: #717171;
+    }
+
+    /* Estilos para la sección de categorías */
+    .categories-section {
+        padding: 50px 0;
+        background-color: #f4f4f4;
+    }
+
+    .categories-title {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 32px;
+    }
+
+    .categories-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .category-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 10px;
+        width: calc(33% - 20px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        position: relative;
+    }
+
+    .category-image-container {
+        width: 100%;
+    }
+
+    .category-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .category-info {
+        padding: 15px;
+    }
+
+    .category-title {
+        font-size: 18px;
+        margin: 10px 0;
+    }
+
+    .btn-category {
+        display: inline-block;
+        font-size: 14px;
+        padding: 8px 16px;
+        color: #007bff;
+        background-color: #fff;
+        border: 1px solid #007bff;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .btn-category:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    /* Estilos para la sección del atleta */
+    .atleta-details {
+        background: #f9f9f9;
+        padding: 50px 0;
+        text-align: center;
+    }
+
+    .atleta-presentacion h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .atleta-image {
+        max-width: 300px;
+        border-radius: 8px;
+    }
+
+    .atleta-details h1 {
+        font-size: 24px;
+        margin: 20px 0;
+    }
+
+    .atleta-details h3 {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .instagram-icon {
+        width: 24px;
+        margin-right: 10px;
+    }
+
+    /* Estilos para la sección de ubicación */
+    .location-section {
+        padding: 50px 0;
+        background-color: #fff;
+    }
+
+    .location-title {
+        font-size: 28px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .location-description {
+        text-align: center;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .contact-info {
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .opening-hours {
+        text-align: center;
+        font-size: 16px;
+    }
+
+    /* Estilos para la sección de contacto */
+    .contact-section {
+        padding: 50px 0;
+        background-color: #f4f4f4;
+    }
+
+    .contact-title {
+        font-size: 28px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .contact-description {
+        text-align: center;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .contact-details {
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .whatsapp-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        text-align: center;
+    }
+
+    .whatsapp-link {
+        display: inline-block;
+        color: #fff;
+        background-color: #25d366;
+        padding: 10px;
+        border-radius: 50%;
+    }
+
+    .whatsapp-icon {
+        width: 50px;
+    }
+
+    .notification-message {
+        background-color: #25d366;
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 5px;
+        font-size: 14px;
+    }
+
+    /* Estilos adicionales para la ventana emergente */
+    .modal {
+        display: none; /* Ocultar por defecto */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        text-align: center;
+        border-radius: 8px;
+    }
+
+    .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .category-card {
+            width: calc(50% - 20px);
+        }
+
+        .atleta-image {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .category-card {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    // Script para abrir el modal
+    var modal = document.getElementById("login-or-guest-modal");
+    var openButton = document.getElementById("open-modal-btn");
+    var closeButton = document.getElementsByClassName("close-button")[0];
+
+    openButton.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    closeButton.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Script para el slider
+    var slideIndex = 0;
+    showSlides();
+
+    function showSlides() {
+        var i;
+        var slides = document.getElementsByClassName("slide");
+        var dots = document.getElementsByClassName("dot");
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        slideIndex++;
+        if (slideIndex > slides.length) {
+            slideIndex = 1;
+        }
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+        }
+        slides[slideIndex - 1].style.display = "block";
+        dots[slideIndex - 1].className += " active";
+        setTimeout(showSlides, 5000); // Cambiar slide cada 5 segundos
+    }
+
+    // Script para las flechas del slider
+    var prev = document.querySelector(".prev");
+    var next = document.querySelector(".next");
+
+    prev.addEventListener("click", function() {
+        plusSlides(-1);
+    });
+
+    next.addEventListener("click", function() {
+        plusSlides(1);
+    });
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    // Script para mostrar las categorías en el slider
+    var categoryCards = document.getElementsByClassName("category-card");
+    var categoriesGrid = document.querySelector(".categories-grid");
+
+    if (categoryCards.length > 0) {
+        categoriesGrid.style.display = "flex";
+        categoriesGrid.style.flexWrap = "wrap";
+    }
+
+    // Script para el contacto de WhatsApp
+    var whatsappContainer = document.querySelector(".whatsapp-container");
+
+    if (whatsappContainer) {
+        whatsappContainer.addEventListener("click", function() {
+            window.location.href = "https://wa.me/1234567890"; // Número de WhatsApp
+        });
+    }
+</script>
+
+<!-- Modal para elegir entre iniciar sesión o comprar como invitado -->
+
+
+<!-- Botón para abrir el modal -->
+<button id="open-modal-btn" style="display: none;">Abrir Modal</button>
+
+<!-- Resto del contenido de la página -->
+
+{% endblock %}

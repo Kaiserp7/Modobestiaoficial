@@ -1,0 +1,105 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+{% block title %}Mis Pedidos{% endblock %}
+
+{% block content %}
+<style>
+    .container {
+        margin-top: 20px;
+    }
+
+    .card {
+        background-color: #333333; /* Fondo gris oscuro */
+        color: #f5f5f5; /* Texto claro */
+        border: 1px solid #444444;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-title {
+        color: #f5ed19; /* Texto amarillo */
+        font-size: 20px;
+        border-bottom: 2px solid #f5ed19;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    .card-text {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .list-group-item {
+        background-color: #2c2c2c; /* Fondo gris más oscuro */
+        color: #f5f5f5; /* Texto claro */
+        border: none;
+        padding: 10px;
+    }
+
+    .list-group-item img {
+        border-radius: 5px;
+    }
+
+    .list-group-item span {
+        font-size: 14px;
+    }
+
+    .list-group-item .mr-3 {
+        margin-right: 15px;
+    }
+
+    .list-group-item .ml-3 {
+        margin-left: 15px;
+    }
+
+    .no-pedidos {
+        text-align: center;
+        color: #f5ed19; /* Texto amarillo para destacar el mensaje */
+        font-size: 18px;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="container">
+    <h2 class="mb-4" style="color: #f5ed19;">Mis Pedidos</h2>
+
+    {% if pedidos %}
+        {% for pedido in pedidos %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">Pedido {{ pedido.id }}</h3>
+                <p class="card-text"><strong>Estado:</strong> {{ pedido.estado }}</p>
+                <p class="card-text"><strong>Tipo de Envío:</strong> {{ pedido.get_tipo_envio_display }}</p>
+                {% if pedido.tipo_envio == 'domicilio_registro' %}
+                    <p><strong>Dirección de Envío:</strong> {{ pedido.usuario.direccion }}</p>
+                {% elif pedido.tipo_envio == 'retiro_sucursal' %}
+                    <p><strong>Retiro en Sucursal</strong></p>
+                {% endif %}
+                <p class="card-text"><strong>Total de Compras:</strong> ${{ pedido.total_compras }}</p>
+                <p class="card-text"><strong>Productos:</strong></p>
+                <ul class="list-group list-group-flush">
+                    {% for item in pedido.productos.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="mr-3" style="max-width: 50px;">
+                            <span>{{ item.producto.nombre }}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span>Cantidad: {{ item.cantidad }}</span>
+                            <span class="ml-3">Precio: ${{ item.producto.precio }}</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-pedidos">No tienes pedidos realizados.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,812 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tienda de Suplementos{% endblock %}</title>
+    <link href="{% static 'css/estilo.css' %}" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{% static 'js/alerts.js' %}"></script>
+    <script src="{% static 'productos/js/cart.js' %}"></script>
+</head>
+<style> 
+/* General */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1, h2, h3 {
+    margin: 0;
+    padding-bottom: 15px;
+}
+
+p {
+    margin: 0;
+    padding: 10px 0;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #ffffff;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1000;
+}
+
+.navbar.scrolled {
+    background-color: #f8f9fa;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo {
+    height: 60px;
+    transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover {
+    transform: scale(1.1);
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav-item {
+    margin-left: 20px;
+    position: relative;
+}
+
+.nav-link {
+    color: #333;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 15px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    border-radius: 4px;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #fff;
+    background-color: #007bff;
+}
+
+.nav-link.active {
+    font-weight: bold;
+}
+
+.search-bar {
+    position: relative;
+    max-width: 400px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 2px solid #007bff;
+    background-color: #ffffff;
+    color: #333;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.search-bar input::placeholder {
+    color: #999;
+}
+
+.search-bar input:focus {
+    border-color: #0056b3;
+    outline: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.search-bar button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    color: #007bff;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+.search-bar button:hover {
+    color: #0056b3;
+}
+
+.cart-icon {
+    position: relative;
+}
+
+.cart-counter {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: #ffffff;
+    border-radius: 50%;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Estilo para el dropdown del carrito */
+.cart-preview {
+    width: 350px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 1000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cart-preview-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cart-preview-body {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+.cart-item img {
+    max-width: 60px;
+    margin-right: 15px;
+    border-radius: 5px;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-details h6 {
+    font-size: 16px;
+    margin: 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.cart-item-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #777;
+}
+
+.cart-preview-footer {
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+    text-align: right;
+}
+
+.cart-total {
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+    margin-top: 10px;
+}
+
+#checkoutButton {
+    background-color: #7000ff;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#checkoutButton:hover {
+    background-color: #5000bf;
+}
+
+.close {
+    font-size: 18px;
+    padding: 0;
+    color: #333;
+}
+
+.close:hover {
+    color: #0056b3;
+}
+
+/* Sección de Bienvenida */
+.welcome-section {
+    background: #f8f9fa;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.welcome-logo {
+    width: 200px;
+    height: auto;
+}
+
+.welcome-title {
+    font-size: 2.5em;
+    margin: 20px 0;
+}
+
+.welcome-description {
+    font-size: 1.2em;
+    color: #666;
+}
+
+/* Slider */
+.slider-container {
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+.slider {
+    position: relative;
+    width: 100%;
+}
+
+.slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+}
+
+.slide {
+    min-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.slider-image {
+    width: 100%;
+    height: auto;
+}
+
+.caption {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    width: calc(100% - 20px);
+    box-sizing: border-box;
+}
+
+.slider-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+}
+
+.prev, .next {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.prev:hover, .next:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 2em;
+    }
+    .welcome-description {
+        font-size: 1em;
+    }
+}
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.footer-logo img {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+
+.footer-social {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+    margin: 5px 0;
+}
+
+.instagram-icon {
+    width: 30px;
+    margin-right: 10px;
+}
+
+.instagram-icon-mini {
+    width: 20px;
+}
+
+.social-text {
+    font-size: 16px;
+}
+
+.footer-info p {
+    font-size: 14px;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+    }
+
+    .social-text {
+        font-size: 14px;
+    }
+}
+</style>
+
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <img src="{% static 'productos/logo/logo3.png' %}" alt="Logo" class="navbar-logo">
+        </a>
+        <div class="search-bar">
+            <form method="get" action="{% url 'search_products' %}" class="form-inline">
+                <input class="form-control mr-2" type="search" name="query" placeholder="Buscar productos..." aria-label="Buscar">
+                <button type="submit" class="btn btn-outline-light" aria-label="Buscar">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown mx-2">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user-circle"></i> {{ user.username }}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                    <a class="dropdown-item" href="{% url 'mis_pedidos' %}">
+                        <i class="fas fa-box"></i> Mis Pedidos
+                    </a>
+                    <a class="dropdown-item" href="{% url 'actualizar_perfil' %}">
+                        <i class="fas fa-user-edit"></i> Actualizar Perfil
+                    </a>
+                    <a class="dropdown-item" href="{% url 'password_change' %}">
+                        <i class="fas fa-key"></i> Cambiar Contraseña
+                    </a>
+                </div>
+            </li>
+    
+            {% if user.is_superuser %}
+            <li class="nav-item dropdown mx-2">
+                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-tools"></i> Administrar
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminDropdown">
+                    <a class="dropdown-item" href="{% url 'create_product' %}">
+                        <i class="fas fa-plus-circle"></i> Crear Producto
+                    </a>
+                    <a class="dropdown-item" href="{% url 'create_category' %}">
+                        <i class="fas fa-folder-plus"></i> Crear Categoría
+                    </a>
+                    <a class="dropdown-item" href="{% url 'agregar_cupon' %}">
+                        <i class="fas fa-ticket-alt"></i> Crear Cupón
+                    </a>
+                    <a class="dropdown-item" href="{% url 'agregar_oferta_carrusel' %}">
+                        <i class="fas fa-tags"></i> Agregar Oferta
+                    </a>
+                    <a class="dropdown-item" href="{% url 'gestionar_pedidos' %}">
+                        <i class="fas fa-clipboard-list"></i> Gestionar Pedidos
+                    </a>
+                    <a class="dropdown-item" href="{% url 'historial_y_estadisticas' %}">
+                        <i class="fas fa-chart-line"></i> Historial y Estadísticas
+                    </a>
+                    <a class="dropdown-item" href="{% url 'escanear_codigo_qr' %}">
+                        <i class="fas fa-qrcode"></i> Escanear Código QR
+                    </a>
+                    <a class="dropdown-item" href="{% url 'verificar_pedido' %}">
+                        <i class="fas fa-search"></i> Verificar Pedido
+                    </a>
+                </div>
+            </li>
+            {% endif %}
+            <li class="nav-item mx-2">
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-in-alt"></i> Cerrar sesión
+                </a>
+            </li>
+    
+            {% else %}
+            <li class="nav-item mx-2">
+                <a class="nav-link" href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </a>
+            </li>
+    
+            <li class="nav-item mx-2">
+                <a class="nav-link" href="{% url 'register' %}">
+                    <i class="fas fa-user-plus"></i> Registrarse
+                </a>
+            </li>
+            {% endif %}
+            <li class="nav-item cart-icon mx-2">
+                <a class="nav-link" href="#" onclick="toggleCartPreview(event)">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-counter" id="cartItemCount">0</span>
+                </a>
+                <div class="cart-preview" id="cartPreview" style="display: none;">
+                    <div class="cart-preview-header d-flex align-items-center justify-content-between p-3 border-bottom">
+                        <h5 class="mb-0">Mi Carrito</h5>
+                        <button type="button" class="close btn btn-outline-secondary" aria-label="Close" onclick="toggleCartPreview(event)">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="cart-preview-body p-3" id="cartPreviewBody">
+                        <p class="text-center">Tu carrito está vacío.</p>
+                    </div>
+                    <div class="cart-preview-footer p-3 border-top">
+                        <div class="cart-total" id="cartTotal"></div>
+                        <a href="{% url 'ver_carrito' %}" class="btn btn-primary mt-2" id="checkoutButton">Ver Carrito</a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    
+    
+    <div class="container mt-5">
+        <!-- SweetAlert2 Message -->
+        {% if messages %}
+        {% for message in messages %}
+        <script>
+            Swal.fire({
+                title: '{{ message.tags }}',
+                text: '{{ message }}',
+                icon: '{{ message.tags }}',
+                confirmButtonText: 'OK'
+            });
+        </script>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Dynamic content goes here -->
+        {% block content %}
+        <!-- Carousel -->
+        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                {% for oferta in ofertas %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ oferta.imagen.url }}" class="d-block w-100" alt="{{ oferta.descripcion }}">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>{{ oferta.titulo }}</h5>
+                        <p>{{ oferta.descripcion }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Anterior</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Siguiente</span>
+            </a>
+        </div>
+        <h2 class="text-center my-5">Nuestros Productos</h2>
+        <!-- Product Cards -->
+        <div class="row row-cols-1 row-cols-md-3">
+            {% for producto in productos %}
+            <div class="col mb-4">
+                <div class="card h-100">
+                    <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                        <p class="card-text">{{ producto.descripcion }}</p>
+                        <p class="card-text">
+                            <span class="font-weight-bold text-primary">
+                                {% if producto.precio_con_descuento %}
+                                ${{ producto.precio_con_descuento }}
+                                {% else %}
+                                ${{ producto.precio }}
+                                {% endif %}
+                            </span>
+                            {% if producto.precio_con_descuento %}
+                            <span class="text-muted">
+                                <s>${{ producto.precio }}</s>
+                            </span>
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'product_detail' producto.id %}" class="btn btn-primary">
+                            Ver Detalles
+                        </a>
+                        <a href="#" class="btn btn-success agregar-carrito" data-producto-id="{{ producto.id }}">
+                            <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            {% endfor %}
+        </div>
+        {% endblock %}
+    </div>
+
+   
+</div>
+</body>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-logo">
+            <img src="{% static 'productos/logo/logo2.png' %}" alt="Modo Bestia Logo">
+        </div>
+        <div class="footer-social">
+            <a href="https://www.instagram.com/modo_bestia_los_angeles_supps/" target="_blank" class="social-link">
+                <img src="{% static 'productos/logo/instagram-icon.png' %}" alt="Instagram" class="instagram-icon">
+                <span class="social-text">Síguenos en Instagram</span>
+            </a>
+           
+            <a href="https://wa.me/+56945305793" target="_blank" rel="noopener noreferrer" class="whatsapp-link">
+                <img src="{% static 'productos/logo/whatsapp.png' %}" alt="WhatsApp" class="whatsapp-icon">
+                <span class="social-text">Hablanos a nuestro whatsapp</span>
+            </a>
+        </div>
+        <div class="footer-info">
+            <p>&copy; 2024 Modo Bestia. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Cart Counter Script -->
+    <script>
+        // Función para obtener el valor de una cookie por nombre
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        // Obtén el token CSRF de las cookies
+        const csrftoken = getCookie('csrftoken');
+    
+        // Función para actualizar el contador del carrito
+        function updateCartCounter() {
+            console.log('Updating cart counter...');
+            fetch('/get-cart-item-count/', {
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Data received:', data);
+                const cartCounter = document.getElementById('cart-counter');
+                if (cartCounter) {
+                    cartCounter.textContent = data.count;
+                } else {
+                    console.error('Element with ID cart-counter not found.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    
+        // Llama a updateCartCounter cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCounter();
+        });
+    
+        // Función para recargar la página
+        function refreshPage() {
+            window.location.reload();
+        }
+    
+        // Configura el intervalo para actualizar la página cada 3 minutos (180000 ms)
+        setInterval(refreshPage, 180000);
+    
+        // Función para manejar el scroll y cambiar el estilo de la navbar
+        document.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNavbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    
+        // Función para alternar la visibilidad de la navbar en dispositivos móviles
+        function toggleNavbar() {
+            const navbarNav = document.getElementById('navbarNav');
+            navbarNav.classList.toggle('show');
+        }
+    
+        // Agrega el manejador de eventos al botón de alternar la navbar
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.querySelector('.navbar-toggler');
+            if (toggleButton) {
+                toggleButton.addEventListener('click', toggleNavbar);
+            }
+        });
+    </script>
+    
+    <script>
+        const toggleSwitch = document.getElementById('darkModeToggle');
+        const currentMode = localStorage.getItem('mode');
+    
+        if (currentMode === 'dark') {
+            document.body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+        }
+    
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('mode', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('mode', 'light');
+            }
+        });
+    
+        // Función para alternar la visibilidad de la vista previa del carrito
+        function toggleCartPreview(event) {
+            event.preventDefault();  // Evita el comportamiento predeterminado del enlace
+            const cartPreview = document.getElementById('cartPreview');
+            if (cartPreview) {
+                cartPreview.style.display = (cartPreview.style.display === 'none' || !cartPreview.style.display) ? 'block' : 'none';
+            }
+        }
+    
+        // Función para actualizar la vista previa del carrito con los datos del carrito
+        function updateCartPreview() {
+            fetch('/vista-previa-carrito/', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'  // Indica que la solicitud es AJAX
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const cartPreviewBody = document.getElementById('cartPreviewBody');
+                const cartItemCount = document.getElementById('cartItemCount');
+                
+                // Actualiza el contador del carrito
+                cartItemCount.textContent = data.cart_item_count;
+                
+                // Limpia el contenido actual del preview
+                cartPreviewBody.innerHTML = '';
+    
+                if (data.carrito_items.length > 0) {
+                    data.carrito_items.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'cart-item';
+                        itemElement.innerHTML = `
+                            <img src="${item.producto.imagen}" alt="${item.producto.nombre}" class="img-fluid rounded" style="max-width: 60px;">
+                            <div>
+                                <h6>${item.producto.nombre}</h6>
+                                <p>$${item.producto.precio_con_descuento} x ${item.cantidad}</p>
+                            </div>
+                        `;
+                        cartPreviewBody.appendChild(itemElement);
+                    });
+                    const totalElement = document.createElement('p');
+                    totalElement.innerHTML = `<strong>Total: $${data.total_carrito}</strong>`;
+                    cartPreviewBody.appendChild(totalElement);
+                } else {
+                    cartPreviewBody.innerHTML = '<p>Tu carrito está vacío.</p>';
+                }
+            })
+            .catch(error => console.error('Error al actualizar la vista previa del carrito:', error));
+        }
+    
+        // Llama a la función para actualizar el carrito al cargar la página
+        document.addEventListener('DOMContentLoaded', updateCartPreview);
+    </script>
+    
+    <script src="{% static 'productos/js/cart.js' %}" defer></script>
+
+</body>
+
+</html>

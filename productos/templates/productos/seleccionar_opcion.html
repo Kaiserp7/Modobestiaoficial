@@ -1,0 +1,11 @@
+{% extends 'productos/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Selecciona una opción</h2>
+    <div class="options">
+        <a href="{% url 'login' %}?next={% url 'agregar_al_carrito' producto_id %}" class="btn btn-primary">Iniciar Sesión</a>
+        <a href="{% url 'compra_invitado' %}" class="btn btn-secondary">Comprar como Invitado</a>
+    </div>
+</div>
+{% endblock %}

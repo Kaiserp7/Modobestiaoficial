@@ -1,0 +1,57 @@
+{% extends 'productos/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Compra como Invitado</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+            <label for="correo">Correo electrónico:</label>
+            <input type="email" class="form-control" id="correo" name="correo" required>
+        </div>
+        <div class="form-group">
+            <label for="direccion">Dirección:</label>
+            <input type="text" class="form-control" id="direccion" name="direccion" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Continuar</button>
+    </form>
+</div>
+<script>
+  $(document).ready(function() {
+    const regionSelector = $('#id_region');
+    const comunaSelector = $('#id_comuna');
+
+    // Inicializar las opciones de comuna
+    const comunas = {};
+
+    {% for comuna in comunas %}
+    if (!comunas["{{ comuna.region.id }}"]) {
+        comunas["{{ comuna.region.id }}"] = [];
+    }
+    comunas["{{ comuna.region.id }}"].push({
+        id: "{{ comuna.id }}",
+        nombre: "{{ comuna.nombre }}"
+    });
+    {% endfor %}
+
+    // Manejar el cambio de selección de región
+    regionSelector.change(function() {
+        const regionSeleccionada = $(this).val();
+        comunaSelector.empty().append('<option value="">Seleccione una comuna</option>');
+
+        if (comunas[regionSeleccionada]) {
+            comunas[regionSeleccionada].forEach(function(comuna) {
+                comunaSelector.append(`<option value="${comuna.id}">${comuna.nombre}</option>`);
+            });
+        }
+    });
+
+    // Inicializar el formulario con las comunas disponibles para la región seleccionada
+    regionSelector.trigger('change');
+});
+</script>
+{% endblock %}

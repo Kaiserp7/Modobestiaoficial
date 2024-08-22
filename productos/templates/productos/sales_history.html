@@ -1,0 +1,38 @@
+<!-- productos/templates/productos/sales_history.html -->
+{% extends 'productos/base.html' %}
+
+{% block title %}Historial de Ventas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Historial de Ventas</h2>
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="thead-dark">
+            <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Total Venta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if ventas %}
+                {% for venta in ventas %}
+                <tr>
+                    <td>{{ venta.fecha|date:"d/m/Y H:i:s" }}</td>
+                    <td>{{ venta.usuario.username }}</td>
+                    <td>{{ venta.producto.nombre }}</td>
+                    <td>{{ venta.cantidad }}</td>
+                    <td>${{ venta.producto.precio_con_descuento|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay ventas registradas.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

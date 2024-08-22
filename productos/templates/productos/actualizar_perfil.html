@@ -1,0 +1,57 @@
+{% extends 'productos/base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2 class="mb-4">Actualizar Perfil</h2>
+    <style>
+        /* styles.css */
+.container {
+  max-width: 600px;
+}
+
+.card {
+  border-radius: 10px;
+}
+
+.card .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.card .form-group label {
+  font-weight: bold;
+}
+
+.card .btn {
+  width: 100%;
+  padding: 0.75rem;
+}
+
+    </style>
+    
+    <div class="card p-4 shadow-sm">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          {{ form.non_field_errors }}
+        </div>
+        
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            <small class="form-text text-muted">
+              {{ field.help_text }}
+            </small>
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+      </form>
+      
+      <div class="mt-3">
+        <a href="{% url 'password_change' %}" class="btn btn-link">Cambiar contraseña</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

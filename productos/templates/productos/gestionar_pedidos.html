@@ -1,0 +1,199 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Gestionar Pedidos{% endblock %}
+
+{% block content %}
+<style>
+    .container {
+        margin-top: 20px;
+    }
+
+    .pedido-container {
+        margin-bottom: 20px;
+        padding: 20px;
+        background-color: #2c2c2c; /* Fondo gris oscuro */
+        border: 1px solid #444444;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: box-shadow 0.3s ease-in-out;
+        font-size: 16px;
+        color: #e0e0e0;
+    }
+
+    .pedido-container:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .pedido-container h3 {
+        margin-bottom: 15px;
+        color: #f5ed19; /* Texto amarillo */
+        font-size: 22px;
+        border-bottom: 2px solid #f5ed19;
+        padding-bottom: 10px;
+    }
+
+    .pedido-container p {
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .pedido-container ul {
+        margin-top: 10px;
+        padding-left: 20px;
+    }
+
+    .pedido-container ul li {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+    }
+
+    .pedido-container img {
+        width: 60px;
+        height: 60px;
+        margin-right: 15px;
+        border-radius: 5px;
+        object-fit: cover;
+    }
+
+    .pedido-container a {
+        color: #f5ed19; /* Color amarillo */
+        text-decoration: none;
+        margin-right: 15px;
+        font-size: 16px;
+    }
+
+    .pedido-container a:hover {
+        text-decoration: underline;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        margin-top: 10px;
+        margin-right: 10px;
+        font-weight: 600;
+        transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        white-space: nowrap;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: #ffffff;
+        border: 1px solid #28a745;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border: 1px solid #218838;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: #ffffff;
+        border: 1px solid #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border: 1px solid #c82333;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-link {
+        font-size: 16px;
+        color: #f5ed19;
+        border: none;
+        background: none;
+    }
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    .btn-icon {
+        margin-right: 8px;
+    }
+</style>
+
+<div class="container">
+    <h2 class="mb-4" style="color: #f5ed19;">Gestionar Pedidos</h2>
+
+    <!-- Formulario de búsqueda -->
+    <form method="GET" action="{% url 'gestionar_pedidos' %}">
+        <div class="form-group">
+            <input type="text" name="q" class="form-control" placeholder="Buscar por ID, usuario o estado" value="{{ query }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+
+    {% for pedido in pedidos %}
+    <div class="pedido-container">
+        <h3>Pedido {{ pedido.id }}</h3>
+        <p><strong>Usuario:</strong> {{ pedido.usuario.username }}</p>
+        <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+        
+        {% if pedido.tipo_envio == 'domicilio_registro' %}
+            <p><strong>Dirección de Envío:</strong> {{ pedido.usuario.direccion }}</p>
+        {% elif pedido.tipo_envio == 'retiro_sucursal' %}
+            <p><strong>Retiro en Sucursal</strong></p>
+        {% endif %}
+
+        <p><strong>Valor Total:</strong> ${{ pedido.valor_total }}</p>
+        <p><strong>Productos:</strong></p>
+        <ul>
+            {% for item in pedido.productos.all %}
+            <li>
+                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}">
+                {{ item.producto.nombre }} - Cantidad: {{ item.cantidad }}
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="mailto:{{ pedido.usuario.email }}?subject=Actualización de Pedido&body=Estimado cliente, le informamos que su pedido está {{ pedido.estado }}." class="btn btn-link"><i class="fas fa-envelope btn-icon"></i>{{ pedido.usuario.email }}</a>
+        <br>
+        <a href="#" class="btn btn-success" onclick="aprobarPedido({{ pedido.id }})"><i class="fas fa-check btn-icon"></i>Aprobar Pedido</a>
+        <a href="#" class="btn btn-danger" onclick="cancelarPedido({{ pedido.id }})"><i class="fas fa-times btn-icon"></i>Cancelar Pedido</a>
+        <a href="{% url 'eliminar_pedido' pedido.id %}" class="btn btn-danger"><i class="fas fa-trash btn-icon"></i>Eliminar Pedido</a>
+        <a href="{% url 'exportar_boleta_pdf' pedido.id %}" class="btn btn-primary"><i class="fas fa-file-pdf btn-icon"></i> Exportar Boleta PDF</a>
+    </div>
+    {% endfor %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function aprobarPedido(pedidoId) {
+        Swal.fire({
+            title: '¿Desea confirmar la aprobación del pedido?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, aprobar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'aprobar_pedido' 0 %}".replace('0', pedidoId);
+            }
+        });
+    }
+
+    function cancelarPedido(pedidoId) {
+        Swal.fire({
+            title: '¿Desea cancelar este pedido?',
+            text: 'Recuerda enviarle un mensaje al cliente a su correo para darle los motivos de la cancelación del pedido.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, cancelar',
+            cancelButtonText: 'No, mantener'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'cancelar_pedido' 0 %}".replace('0', pedidoId);
+            }
+        });
+    }
+</script>
+{% endblock %}

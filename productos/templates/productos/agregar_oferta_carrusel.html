@@ -1,0 +1,44 @@
+{% extends 'productos/base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Agregar Oferta al Carrusel</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Agregar Oferta</button>
+        </form>
+
+        <h2 class="mt-5">Ofertas Actuales</h2>
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Fecha de Término</th>
+                    <th>Imagen</th>
+                    <th>Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for oferta in ofertas %}
+                    <tr>
+                        <td>{{ oferta.nombre }}</td>
+                        <td>{{ oferta.categoria.nombre }}</td>
+                        <td>{{ oferta.fecha_inicio }}</td>
+                        <td>{{ oferta.fecha_termino }}</td>
+                        <td>
+                            <img src="{{ oferta.imagen_promocional.url }}" alt="{{ oferta.nombre }}" style="height: 50px;">
+                        </td>
+                        <td>{{ oferta.detalles }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay ofertas disponibles.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

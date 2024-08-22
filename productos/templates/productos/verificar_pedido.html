@@ -1,0 +1,39 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Verificar Pedido{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4" style="color: #f5ed19;">Detalles del Pedido</h2>
+    
+    <div class="pedido-container">
+        <h3>Pedido {{ pedido.id }}</h3>
+        <p><strong>Código:</strong> {{ pedido.codigo }}</p>
+        <p><strong>Usuario:</strong> {{ pedido.usuario.username }}</p>
+        <p><strong>Email:</strong> {{ pedido.usuario.email }}</p>
+        <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+        <p><strong>Fecha de Creación:</strong> {{ pedido.fecha_creacion }}</p>
+
+        {% if pedido.tipo_envio == 'domicilio_registro' %}
+            <p><strong>Dirección de Envío:</strong> {{ pedido.usuario.direccion }}</p>
+        {% elif pedido.tipo_envio == 'retiro_sucursal' %}
+            <p><strong>Retiro en Sucursal</strong></p>
+        {% endif %}
+        
+        <p><strong>Productos:</strong></p>
+        <ul>
+            {% for item in pedido.productos.all %}
+            <li>
+                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" style="width: 50px; height: 50px;">
+                {{ item.producto.nombre }} - Cantidad: {{ item.cantidad }}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <p><strong>Valor Total:</strong> ${{ pedido.valor_total }}</p>
+
+        <a href="mailto:{{ pedido.usuario.email }}?subject=Actualización de Pedido&body=Estimado cliente, le informamos que su pedido está {{ pedido.estado }}." class="btn btn-link"><i class="fas fa-envelope btn-icon"></i> Contactar Cliente</a>
+        <a href="{% url 'exportar_boleta_pdf' pedido.id %}" class="btn btn-primary"><i class="fas fa-file-pdf btn-icon"></i> Exportar Boleta PDF</a>
+    </div>
+</div>
+{% endblock %}

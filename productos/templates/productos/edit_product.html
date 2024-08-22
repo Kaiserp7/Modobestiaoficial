@@ -1,0 +1,69 @@
+{% extends 'productos/base.html' %}
+{% block title %}Editar Producto{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Editar Producto</h2>
+    <form method="post" enctype="multipart/form-data" class="form-edit-product">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Guardar Cambios</button>
+    </form>
+</div>
+
+<style>
+    .container {
+        max-width: 800px; /* Máximo ancho del contenedor */
+    }
+
+    .form-edit-product {
+        background-color: #252525; /* Fondo gris oscuro */
+        padding: 20px;
+        border-radius: 8px; /* Bordes redondeados */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra sutil */
+    }
+
+    .form-edit-product h2 {
+        color: #f5ed19; /* Texto amarillo */
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        color: #e0e0e0; /* Texto gris claro */
+        font-weight: bold;
+    }
+
+    .form-control {
+        background-color: #333; /* Fondo de los campos de entrada */
+        color: #e0e0e0; /* Texto de los campos de entrada */
+        border: 1px solid #555; /* Borde de los campos de entrada */
+        border-radius: 4px; /* Bordes redondeados */
+        padding: 10px;
+    }
+
+    .form-control:focus {
+        border-color: #f5ed19; /* Borde amarillo al enfocarse */
+        box-shadow: 0 0 0 0.2rem rgba(245, 237, 25, 0.25); /* Sombra amarilla */
+    }
+
+    .btn-primary {
+        background-color: #f5ed19; /* Fondo amarillo */
+        border: none;
+        color: #252525; /* Texto gris oscuro */
+        font-size: 18px;
+        padding: 10px 20px;
+        border-radius: 4px; /* Bordes redondeados */
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .btn-primary:hover {
+        background-color: #e5db17; /* Fondo amarillo más oscuro */
+    }
+</style>
+{% endblock %}

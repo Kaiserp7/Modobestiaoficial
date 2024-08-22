@@ -1,0 +1,92 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="login-form">
+        <h2 class="text-center mb-4">Iniciar Sesión</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" class="btn custom-btn">Iniciar Sesión</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Centra verticalmente en la pantalla */
+    }
+
+    .login-form {
+        background: #ffffff; /* Fondo blanco */
+        padding: 2rem;
+        border-radius: 12px; /* Bordes más redondeados */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+        width: 100%;
+        max-width: 400px; /* Ancho máximo del contenedor del formulario */
+    }
+
+    .login-form h2 {
+        color: #333333; /* Texto oscuro */
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        color: #555555; /* Texto gris oscuro */
+        font-weight: bold;
+    }
+
+    .form-control {
+        background-color: #f4f4f4; /* Fondo gris claro para los campos de entrada */
+        color: #333333; /* Texto oscuro en los campos de entrada */
+        border: 1px solid #cccccc; /* Borde gris claro */
+        border-radius: 8px; /* Bordes redondeados */
+        padding: 0.75rem;
+    }
+
+    .form-control:focus {
+        border-color: #6c63ff; /* Borde azul al enfocarse */
+        box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25); /* Sombra azul */
+    }
+
+    .custom-btn {
+        background-color: #6c63ff; /* Fondo azul */
+        border: none;
+        color: #ffffff; /* Texto blanco */
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px; /* Bordes redondeados */
+        transition: background-color 0.3s ease;
+        width: 100%; /* Botón de ancho completo */
+    }
+
+    .custom-btn:hover {
+        background-color: #5a54e2; /* Fondo azul más oscuro */
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if form.errors %}
+            Swal.fire({
+                title: 'Error!',
+                text: 'Verifica que el Usuario y Contraseña sean correctos.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+        {% endif %}
+    });
+</script>
+{% endblock %}
